@@ -1,0 +1,38 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: node-express-service
+  labels:
+    app: node-express
+spec:
+  type: ClusterIP
+  ports:
+    - port: 3000
+      targetPort: 3000
+  selector:
+    app: node-express
+
+---
+apiVersion: apps/v1  # Fixed: "app" → "apps"
+kind: Deployment
+metadata:
+  name: node-express-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: node-express
+  template:
+    metadata:
+      labels:
+        app: node-express
+    spec:
+      containers:  # Fixed: "cotainers" → "containers"
+        - name: node-app
+          image: monta2027/node-express:latest
+          ports:
+            - containerPort: 3000
+          resources:
+            limits:
+              cpu: "1"
+              memory: "512Mi"
