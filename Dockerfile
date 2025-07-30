@@ -4,7 +4,9 @@ WORKDIR /app
 
 COPY package*.json ./
 
-RUN npm install --fetch-timeout=300000 --fetch-retry-mintimeout=20000
+# Install netcat-openbsd and iputils-ping
+RUN apt-get update && apt-get install -y netcat-openbsd iputils-ping && \
+    npm install --fetch-timeout=300000 --fetch-retry-mintimeout=20000
 
 COPY . .
 

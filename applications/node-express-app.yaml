@@ -1,0 +1,18 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: node-express-app
+  namespace: argocd
+spec:
+  project: default  # Required field
+  source:
+    repoURL: https://github.com/montabellakhal2027/node-express-boilerplate.git
+    path: k8s/  # Path to your manifests
+    targetRevision: main  # Branch/tag
+  destination:  # Required field
+    server: https://kubernetes.default.svc  # In-cluster
+    namespace: default  # Target namespace
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

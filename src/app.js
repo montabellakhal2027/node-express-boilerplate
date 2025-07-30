@@ -1,13 +1,13 @@
-const express = require('express');
-const helmet = require('helmet');
-const xss = require('xss-clean');
-const mongoSanitize = require('express-mongo-sanitize');
-const compression = require('compression');
-const cors = require('cors');
-const passport = require('passport');
-const httpStatus = require('http-status');
+require('module-alias/register');
 const config = require('./config/config');
-const morgan = require('./config/morgan');
+const express = require('express');
+const cors = require('cors');
+const helmet = require('helmet');
+const httpStatus = require('http-status');
+const mongoSanitize = require('express-mongo-sanitize');
+const xss = require('xss-clean');
+const compression = require('compression');
+const passport = require('passport');
 const { jwtStrategy } = require('./config/passport');
 const { authLimiter } = require('./middlewares/rateLimiter');
 const routes = require('./routes/v1');
@@ -16,52 +16,58 @@ const ApiError = require('./utils/ApiError');
 
 const app = express();
 
-if (config.env !== 'test') {
-  app.use(morgan.successHandler);
-  app.use(morgan.errorHandler);
-}
+// Enable if you're behind a reverse proxy (e.g., Kubernetes)
+app.set('trust proxy', true);
 
-// set security HTTP headers
+// Set security HTTP headers
 app.use(helmet());
 
-// parse json request body
+// Parse json request body
 app.use(express.json());
 
-// parse urlencoded request body
+// Parse urlencoded request body
 app.use(express.urlencoded({ extended: true }));
 
-// sanitize request data
+// Sanitize request data
 app.use(xss());
 app.use(mongoSanitize());
 
-// gzip compression
+// Gzip compression
 app.use(compression());
 
-// enable cors
+// Enable cors
 app.use(cors());
 app.options('*', cors());
 
-// jwt authentication
-app.use(passport.initialize());
+// Add API prefix
+app.use('/api/v1', routes);
+
+// Add root route for health checks
+app.get('/', (req, res) => {
+  res.status(200).json({
+    message: 'Server is running',
+    environment: config.env,
+    timestamp: new Date().toISOString()
+  });
+});
+
+// JWT authentication
 passport.use('jwt', jwtStrategy);
 
-// limit repeated failed requests to auth endpoints
+// Limit repeated failed requests to auth endpoints
 if (config.env === 'production') {
-  app.use('/v1/auth', authLimiter);
+  app.use('/api/v1/auth', authLimiter);
 }
 
-// v1 api routes
-app.use('/v1', routes);
-
-// send back a 404 error for any unknown api request
+// Handle 404
 app.use((req, res, next) => {
   next(new ApiError(httpStatus.NOT_FOUND, 'Not found'));
 });
 
-// convert error to ApiError, if needed
+// Convert error to ApiError, if needed
 app.use(errorConverter);
 
-// handle error
+// Handle error
 app.use(errorHandler);
 
 module.exports = app;

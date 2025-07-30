@@ -1,19 +1,4 @@
-apiVersion: v1
-kind: Service
-metadata:
-  name: node-express-service
-  labels:
-    app: node-express
-spec:
-  type: ClusterIP
-  ports:
-    - port: 3000
-      targetPort: 3000
-  selector:
-    app: node-express
-
----
-apiVersion: apps/v1  # Fixed: "app" → "apps"
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: node-express-deployment
@@ -27,12 +12,21 @@ spec:
       labels:
         app: node-express
     spec:
-      containers:  # Fixed: "cotainers" → "containers"
+      containers:
         - name: node-app
           image: monta2027/node-express:latest
           ports:
             - containerPort: 3000
-          resources:
-            limits:
-              cpu: "1"
-              memory: "512Mi"
+          env:
+            - name: NODE_ENV
+              value: "development"
+            - name: MONGODB_URL
+              valueFrom:
+                secretKeyRef:
+                  name: node-express-secret
+                  key: MONGODB_URL
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: node-express-secret
+                  key: JWT_SECRET
