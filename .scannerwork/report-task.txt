@@ -1,0 +1,6 @@
+projectKey=montabellakhal2027_node-express-boilerplate_21
+serverUrl=http://localhost:9000
+serverVersion=25.7.0.110598
+dashboardUrl=http://localhost:9000/dashboard?id=montabellakhal2027_node-express-boilerplate_21
+ceTaskId=1039e157-752a-4ba1-a21a-c5e937c6c2b6
+ceTaskUrl=http://localhost:9000/api/ce/task?id=1039e157-752a-4ba1-a21a-c5e937c6c2b6
