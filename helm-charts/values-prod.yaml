@@ -1,0 +1,13 @@
+replicaCount: 3
+image:
+  tag: latest
+resources:
+  limits:
+    cpu: 1000m
+    memory: 1Gi
+mongodb:
+  persistence:
+    enabled: true
+    size: 10Gi
+env:
+  NODE_ENV: production

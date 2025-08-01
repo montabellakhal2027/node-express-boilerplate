@@ -34,6 +34,9 @@ resource "helm_release" "argocd" {
   chart      = "argo-cd"
   version    = "5.46.8"
   namespace  = kubernetes_namespace.argocd.metadata[0].name
+  timeout    = 600     # 10-minute timeout
+  wait       = true    # Wait for resources
+  atomic     = true    # Rollback if failed
 
   set {
     name  = "server.service.type"
@@ -50,5 +53,4 @@ resource "helm_release" "argocd" {
     value = "argocd.local"
   }
 }
-
 

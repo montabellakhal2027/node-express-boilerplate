@@ -1,0 +1,7 @@
+replicaCount: 1
+resources:
+  limits:
+    cpu: 200m
+    memory: 256Mi
+env:
+  NODE_ENV: development
